@@ -1,6 +1,6 @@
 # Nibbler for a REST Server
 
-This a version of nibbler which is able to communicate with a
+This a version of Nibbler which is able to communicate with a
 remote REST version of Leela Chess Zero.
 
 The idea is that anybody can just use lc0 without
@@ -14,7 +14,7 @@ If you want to host yourself, the code for the remote server can be found here:
 
 https://github.com/hauensteina/lc0-server.git
 
-The original nibbler with detailed build instructions etc is here:
+The original Nibbler with detailed build instructions etc is here:
 
 https://github.com/fohristiwhirl/nibbler.git
 
