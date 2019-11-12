@@ -1,9 +1,9 @@
-# Nibbler for a REST server
+# Nibbler for a REST Server
 
 This a version of nibbler which is able to communicate with a
-remote REST version of leela chess zero.
+remote REST version of Leela Chess Zero.
 
-The idea is that anybody can just use leela chess zero without
+The idea is that anybody can just use lc0 without
 needing a GPU or even any install of leela at all.
 
 To see if the the remote server is up:
