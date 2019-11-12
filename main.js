@@ -8,6 +8,7 @@ const messages = require("./modules/messages");
 const path = require("path");
 const running_as_electron = require("./modules/running_as_electron");
 const url = require("url");
+const fetch = require("node-fetch");
 
 // We want sync save and open dialogs. In Electron 5 we could get these by calling
 // showSaveDialog or showOpenDialog without a callback, but in Electron 6 this no
@@ -56,9 +57,12 @@ function startup() {
 		webPreferences: {
 			backgroundThrottling: false,
 			nodeIntegration: true,
-			zoomFactor: 1 / electron.screen.getPrimaryDisplay().scaleFactor		// Unreliable, see https://github.com/electron/electron/issues/10572
+			zoomFactor: 1 / electron.screen.getPrimaryDisplay().scaleFactor,		// Unreliable, see https://github.com/electron/electron/issues/10572
+      webSecurity: false
 		}
 	});
+  // Open the DevTools.
+  win.webContents.openDevTools()
 
 	win.once("ready-to-show", () => {
 		win.webContents.setZoomFactor(1 / electron.screen.getPrimaryDisplay().scaleFactor);		// This seems to work, note issue 10572 above.
@@ -67,11 +71,11 @@ function startup() {
 	});
 
 	win.webContents.once("crashed", () => {
-	    alert(messages.renderer_crash);
+	  alert(messages.renderer_crash);
 	});
 
 	win.webContents.once("unresponsive", () => {
-	    alert(messages.renderer_hang);
+	  alert(messages.renderer_hang);
 	});
 
 	electron.app.on("window-all-closed", () => {
@@ -117,7 +121,9 @@ function startup() {
 	}));
 
 	electron.Menu.setApplicationMenu(menu);
-}
+
+  set_leela_proxy()
+} // startup()
 
 function menu_build() {
 
@@ -287,40 +293,40 @@ function menu_build() {
 					label: "Play choice",
 					submenu: [
 						{
-						label: "1st",
-						accelerator: "F1",
-						click: () => {
-							win.webContents.send("call", {
-								fn: "play_info_index",
-								args: [0]
-							})}
+						  label: "1st",
+						  accelerator: "F1",
+						  click: () => {
+							  win.webContents.send("call", {
+								  fn: "play_info_index",
+								  args: [0]
+							  })}
 						},
 						{
-						label: "2nd",
-						accelerator: "F2",
-						click: () => {
-							win.webContents.send("call", {
-								fn: "play_info_index",
-								args: [1]
-							})}
+						  label: "2nd",
+						  accelerator: "F2",
+						  click: () => {
+							  win.webContents.send("call", {
+								  fn: "play_info_index",
+								  args: [1]
+							  })}
 						},
 						{
-						label: "3rd",
-						accelerator: "F3",
-						click: () => {
-							win.webContents.send("call", {
-								fn: "play_info_index",
-								args: [2]
-							})}
+						  label: "3rd",
+						  accelerator: "F3",
+						  click: () => {
+							  win.webContents.send("call", {
+								  fn: "play_info_index",
+								  args: [2]
+							  })}
 						},
 						{
-						label: "4th",
-						accelerator: "F4",
-						click: () => {
-							win.webContents.send("call", {
-								fn: "play_info_index",
-								args: [3]
-							})}
+						  label: "4th",
+						  accelerator: "F4",
+						  click: () => {
+							  win.webContents.send("call", {
+								  fn: "play_info_index",
+								  args: [3]
+							  })}
 						},
 					]
 				},
@@ -1573,7 +1579,7 @@ function menu_build() {
 				{
 					label: "CPuct",
 					submenu: [
-					{
+					  {
 							label: "4.0",
 							type: "checkbox",
 							checked: config.options.CPuct === 4.0,
@@ -2092,3 +2098,56 @@ function set_checks(...menupath) {
 		}
 	}, 50);
 }
+
+const {ipcMain} = require('electron')
+const LC0_URL = 'https://ahaux.com/lc0_server_test/'
+//const LC0_URL = 'https://ahaux.com/lc0_server/'
+
+// The client (aka renderer) cannot call external APIs directly.
+// This is the proxy. (AHN)
+//------------------------------------------------------------------
+function set_leela_proxy() {
+  // Attach listener in the main process as 'call-leela'
+  ipcMain.on('call-leela', (event, arg) => {
+    var myurl = LC0_URL + arg.ep
+    //myurl += '?tt=' + Math.random() // prevent caching
+    var parms = arg.parms
+    console.log( parms)
+    set_leela_proxy.request_id = Math.random() + ''
+    // parms *must* have a config key
+    parms.config.request_id = set_leela_proxy.request_id
+    set_leela_proxy.waiting = true
+
+    // Call the lc0 server API
+    fetch( myurl,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin':null
+        },
+        body: JSON.stringify( parms)
+      }
+    ).then( (resp) => {
+      console.log( '>>>>>>>>>')
+      console.log( resp)
+      resp.json().then( (resp) => {
+        if (!set_leela_proxy.waiting) {
+          console.log( 'not waiting')
+          return
+        }
+        if ('request_id' in resp) {
+          if (resp.request_id != set_leela_proxy.request_id) {
+            return
+          }
+        }
+        set_leela_proxy.waiting = false
+        event.sender.send('leela-response', resp)
+      }) }
+    ).catch(
+      (error) => {
+        console.log( error)
+      }
+    )
+  })
+} // set_leela_proxy()

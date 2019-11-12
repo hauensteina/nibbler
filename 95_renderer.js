@@ -1,7 +1,6 @@
 "use strict";
 
 function NewRenderer() {
-
 	let renderer = Object.create(null);
 
 	renderer.engine = NewEngine();								// Engine connection. Needs its setup() called.
@@ -99,7 +98,7 @@ function NewRenderer() {
 
 		moves.reverse();
 
-		// moves is now the sequence of moves that gets us from 
+		// moves is now the sequence of moves that gets us from
 		// the info_handler board to our board.
 
 		let oldinfo = this.info_handler.table[moves[0]];
@@ -295,7 +294,7 @@ function NewRenderer() {
 				sibling.detach();
 			}
 		}
-		
+
 		this.movelist_handler.draw(this.node);
 	};
 
@@ -454,7 +453,7 @@ function NewRenderer() {
 	};
 
 	renderer.validate_pgn = function(filename) {
-		
+
 		let buf;
 		try {
 			buf = fs.readFileSync(filename);		// i.e. binary buffer object
@@ -488,6 +487,8 @@ function NewRenderer() {
 		return config.versus.includes(this.node.get_board().active);
 	};
 
+  // Handle one line of output from Leela
+  //----------------------------------------
 	renderer.receive = function(s) {
 
 		debug.receive = debug.receive ? debug.receive + 1 : 1;
@@ -516,7 +517,7 @@ function NewRenderer() {
 		}
 
 		debug.receive -= 1;
-	};
+	} // receive()
 
 	renderer.err_receive = function(s) {
 
@@ -538,7 +539,7 @@ function NewRenderer() {
 
 	renderer.go_or_halt = function(new_game_flag) {
 		if (this.leela_should_go()) {
-			this.__go(new_game_flag);								
+			this.__go(new_game_flag);
 		} else {
 			this.__halt(new_game_flag);
 		}
@@ -546,7 +547,7 @@ function NewRenderer() {
 
 	renderer.__halt = function(new_game_flag) {		// "isready" is not needed. If changing position, invalid data will be discarded by renderer.receive().
 		if (this.leela_maybe_running) {
-			this.engine.send("stop");		
+			this.engine.send("stop");
 			this.leela_maybe_running = false;
 		}
 		if (new_game_flag) {
@@ -554,54 +555,58 @@ function NewRenderer() {
 		}
 	};
 
-	renderer.__go = function(new_game_flag) {
+  // Communication with Leela @@@
+  //===============================================
+	renderer.__go = function(new_game_flag)
+  //================================================
+  {
+		this.validate_searchmoves()				// Leela can crash on illegal searchmoves.
+		this.hide_pgn_chooser()
 
-		this.validate_searchmoves();				// Leela can crash on illegal searchmoves.
-		this.hide_pgn_chooser();
+		//if (this.leela_maybe_running) {
+		//	this.engine.send("stop");
+		//}
 
-		if (this.leela_maybe_running) {
-			this.engine.send("stop");
-		}
+		//if (new_game_flag) {
+		//	this.engine.send("ucinewgame");			// Shouldn't be sent when engine is running.
+		//}
 
-		if (new_game_flag) {
-			this.engine.send("ucinewgame");			// Shouldn't be sent when engine is running.
-		}
-
-		let start_fen = this.node.get_root().get_board().fen();
+		let start_fen = this.node.get_root().get_board().fen()
 
 		let setup;
 		if (start_fen === "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") {
-			setup = "startpos";
+			setup = "startpos"
 		} else {
-			setup = `fen ${start_fen}`;
+			setup = `fen ${start_fen}`
 		}
 
 		// Leela seems to time "readyok" correctly after "position" commands.
 		// After sending "isready" we'll ignore Leela output until "readyok" comes.
 
-		this.engine.send(`position ${setup} moves ${this.node.history().join(" ")}`);
-		this.engine.send("isready");
+		//this.engine.send("isready");
 
 		let s;
 
 		if (typeof config.search_nodes !== "number" || config.search_nodes < 1) {
-			s = "go infinite";
+			s = "go infinite"
 		} else {
-			s = `go nodes ${config.search_nodes}`;
+			s = `go nodes ${config.search_nodes}`
 		}
 
 		if (this.searchmoves.length > 0) {
-			s += " searchmoves";
+			s += " searchmoves"
 			for (let move of this.searchmoves) {
-				s += " " + move;
+				s += " " + move
 			}
 		}
 
-		this.engine.send(s);
+    // Hit Leela with position and go.
+		this.engine.send( [ 'ucinewgame', `position ${setup} moves ${this.node.history().join(" ")}`, s] )
 
-		this.leela_maybe_running = true;
-		this.leela_position = this.node.get_board();
-	};
+		//this.leela_maybe_running = true;
+		this.leela_position = this.node.get_board()
+	}
+  //======== END Communication with Leela ==============
 
 	renderer.validate_searchmoves = function() {
 
@@ -672,36 +677,37 @@ function NewRenderer() {
 	};
 
 	renderer.engine_start = function() {
+    console.log( 'engine_start()')
+		//if (this.engine.exe) {				// We already have an engine connection (possibly non-functioning, but still...)
+		//	this.engine.shutdown();
+		//	this.engine = NewEngine();
+		//}
 
-		if (this.engine.exe) {				// We already have an engine connection (possibly non-functioning, but still...)
-			this.engine.shutdown();
-			this.engine = NewEngine();
-		}
+		//this.info_handler.clear(this.node.get_board());
+		//this.info_handler.reset_engine_info();
 
-		this.info_handler.clear(this.node.get_board());
-		this.info_handler.reset_engine_info();
+		/* if (typeof config.path !== "string" || fs.existsSync(config.path) === false) {
 
-		if (typeof config.path !== "string" || fs.existsSync(config.path) === false) {
-
-			if (!config.failure) {			// Only show the following if there isn't a bigger problem...
-				this.err_receive(`<span class="blue">${messages.engine_not_present}</span>`);
-				this.err_receive("");
-			}
-			return;
-		}
-
+			 if (!config.failure) {			// Only show the following if there isn't a bigger problem...
+			 this.err_receive(`<span class="blue">${messages.engine_not_present}</span>`);
+			 this.err_receive("");
+			 }
+			 return;
+		   }
+     */
+    //@@@
 		this.engine.setup(this.receive.bind(this), this.err_receive.bind(this));
 
-		this.engine.send("uci");
-		for (let key of Object.keys(config.options)) {
-			this.engine.setoption(key, config.options[key]);
-		}
-		this.engine.setoption("VerboseMoveStats", true);			// Required for LogLiveStats to work.
-		this.engine.setoption("LogLiveStats", true);				// "Secret" Lc0 command.
-		this.engine.setoption("MultiPV", 500);
-		this.engine.setoption("SmartPruningFactor", 0);
-		this.engine.setoption("ScoreType", "centipawn");			// The default, but the user can't be allowed to override this.
-		this.engine.send("ucinewgame");
+		//this.engine.send("uci");
+		//for (let key of Object.keys(config.options)) {
+			//this.engine.setoption(key, config.options[key]);
+		//}
+		//this.engine.setoption("VerboseMoveStats", true);			// Required for LogLiveStats to work.
+		//this.engine.setoption("LogLiveStats", true);				// "Secret" Lc0 command.
+		//this.engine.setoption("MultiPV", 500);
+		//this.engine.setoption("SmartPruningFactor", 0);
+		//this.engine.setoption("ScoreType", "centipawn");			// The default, but the user can't be allowed to override this.
+		//this.engine.send("ucinewgame");
 	};
 
 	// --------------------------------------------------------------------------------------------
@@ -945,7 +951,7 @@ function NewRenderer() {
 
 		let s = EventPathString(event, "overlay_");
 		let p = Point(s);
-		
+
 		if (p === Point(null)) {
 			return;
 		}
@@ -1425,5 +1431,6 @@ function NewRenderer() {
 		setTimeout(this.spin.bind(this), config.update_delay);
 	};
 
+  renderer.engine_start()
 	return renderer;
-}
+} // NewRenderer()
