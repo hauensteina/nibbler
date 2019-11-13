@@ -322,10 +322,10 @@ function NewRenderer() {
 	};
 
 	renderer.new_game = function() {
-		DestroyTree(this.node);			// Optional, but might help the GC.
-		this.node = NewTree();
-    this.node.get_board().active = null
-		this.position_changed(true);
+		DestroyTree(this.node)		// Optional, but might help the GC.
+		this.node = NewTree()
+    renderer.set_versus( "")
+		this.position_changed(true)
 	};
 
 	renderer.infobox_to_clipboard = function() {

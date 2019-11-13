@@ -127,8 +127,6 @@ function startup() {
 
 function menu_build() {
 
-	const million = 1000000;
-
 	const template = [
 		{
 			label: "App",
@@ -136,7 +134,7 @@ function menu_build() {
 				{
 					label: "About",
 					click: () => {
-						alert(`Nibbler ${electron.app.getVersion()} in Electron ${process.versions.electron}\n\nEngine: ${loaded_engine}\nWeights: ${loaded_weights}`);
+						alert(`Nibbler ${electron.app.getVersion()} in Electron ${process.versions.electron}\n\nModified for http access to remote lz0`);
 					}
 				},
 				{
@@ -984,255 +982,22 @@ function menu_build() {
 		{
 			label: "Engine",
 			submenu: [
-				{
-					label: "Choose engine...",
-					click: () => {
-						let files = open_dialog({
-							properties: ["openFile"]
-						});
-						if (files && files.length > 0) {
-							win.webContents.send("call", {
-								fn: "switch_engine",
-								args: [files[0]]
-							});
-							loaded_engine = files[0];
-						}
-					}
-				},
-				{
-					label: "Choose weights file...",
-					click: () => {
-						let files = open_dialog({
-							properties: ["openFile"]
-						});
-						if (files && files.length > 0) {
-							win.webContents.send("call", {
-								fn: "switch_weights",
-								args: [files[0]]
-							});
-							loaded_weights = files[0];
-						}
-					}
-				},
-				{
-					label: "Backend",
-					submenu: [
-						{
-							label: "cudnn",
-							type: "checkbox",
-							checked: config.options.Backend === "cudnn",
-							click: () => {
-								set_checks("Engine", "Backend", "cudnn");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["cudnn"]
-								});
-							}
-						},
-						{
-							label: "cudnn-fp16",
-							type: "checkbox",
-							checked: config.options.Backend === "cudnn-fp16",
-							click: () => {
-								set_checks("Engine", "Backend", "cudnn-fp16");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["cudnn-fp16"]
-								});
-							}
-						},
-						{
-							label: "opencl",
-							type: "checkbox",
-							checked: config.options.Backend === "opencl",
-							click: () => {
-								set_checks("Engine", "Backend", "opencl");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["opencl"]
-								});
-							}
-						},
-						{
-							label: "blas",
-							type: "checkbox",
-							checked: config.options.Backend === "blas",
-							click: () => {
-								set_checks("Engine", "Backend", "blas");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["blas"]
-								});
-							}
-						},
-						{
-							label: "check",
-							type: "checkbox",
-							checked: config.options.Backend === "check",
-							click: () => {
-								set_checks("Engine", "Backend", "check");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["check"]
-								});
-							}
-						},
-						{
-							label: "random",
-							type: "checkbox",
-							checked: config.options.Backend === "random",
-							click: () => {
-								set_checks("Engine", "Backend", "random");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["random"]
-								});
-							}
-						},
-						{
-							label: "roundrobin",
-							type: "checkbox",
-							checked: config.options.Backend === "roundrobin",
-							click: () => {
-								set_checks("Engine", "Backend", "roundrobin");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["roundrobin"]
-								});
-							}
-						},
-						{
-							label: "multiplexing",
-							type: "checkbox",
-							checked: config.options.Backend === "multiplexing",
-							click: () => {
-								set_checks("Engine", "Backend", "multiplexing");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["multiplexing"]
-								});
-							}
-						},
-						{
-							label: "demux",
-							type: "checkbox",
-							checked: config.options.Backend === "demux",
-							click: () => {
-								set_checks("Engine", "Backend", "demux");
-								win.webContents.send("call", {
-									fn: "switch_backend",
-									args: ["demux"]
-								});
-							}
-						}
-					]
-				},
-				{
-					type: "separator"
-				},
-				{
-					label: "Reset Lc0 cache",
-					accelerator: "F12",
-					click: () => {
-						win.webContents.send("call", "reset_leela_cache");
-					}
-				},
-				{
-					type: "separator"
-				},
+				/* {
+					 type: "separator"
+				   },
+				   {
+					 label: "Reset Lc0 cache",
+					 accelerator: "F12",
+					 click: () => {
+					 win.webContents.send("call", "reset_leela_cache");
+					 }
+				   },
+				   {
+					 type: "separator"
+				   }, */
 				{
 					label: "Node limit",
 					submenu: [
-						{
-							label: "Infinite",
-							type: "checkbox",
-							checked: typeof config.search_nodes !== "number",
-							click: () => {
-								set_checks("Engine", "Node limit", "Infinite");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [null]
-								});
-							}
-						},
-						{
-							type: "separator"
-						},
-						{
-							label: "256,000,000",
-							type: "checkbox",
-							checked: config.search_nodes === 256 * million,
-							click: () => {
-								set_checks("Engine", "Node limit", "256,000,000");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [256 * million]
-								});
-							}
-						},
-						{
-							label: "64,000,000",
-							type: "checkbox",
-							checked: config.search_nodes === 64 * million,
-							click: () => {
-								set_checks("Engine", "Node limit", "64,000,000");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [64 * million]
-								});
-							}
-						},
-						{
-							label: "16,000,000",
-							type: "checkbox",
-							checked: config.search_nodes === 16 * million,
-							click: () => {
-								set_checks("Engine", "Node limit", "16,000,000");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [16 * million]
-								});
-							}
-						},
-						{
-							label: "4,000,000",
-							type: "checkbox",
-							checked: config.search_nodes === 4 * million,
-							click: () => {
-								set_checks("Engine", "Node limit", "4,000,000");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [4 * million]
-								});
-							}
-						},
-						{
-							label: "1,000,000",
-							type: "checkbox",
-							checked: config.search_nodes === 1 * million,
-							click: () => {
-								set_checks("Engine", "Node limit", "1,000,000");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [1 * million]
-								});
-							}
-						},
-						{
-							type: "separator"
-						},
-						{
-							label: "256,000",
-							type: "checkbox",
-							checked: config.search_nodes === 256000,
-							click: () => {
-								set_checks("Engine", "Node limit", "256,000");
-								win.webContents.send("call", {
-									fn: "set_node_limit",
-									args: [256000]
-								});
-							}
-						},
 						{
 							label: "64,000",
 							type: "checkbox",
@@ -1347,362 +1112,10 @@ function menu_build() {
 					]
 				},
 				{
-					label: "Threads",
-					submenu: [
-						{
-							label: "128",
-							type: "checkbox",
-							checked: config.options.Threads === 128,
-							click: () => {
-								set_checks("Engine", "Threads", "128");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [128],
-								});
-							}
-						},
-						{
-							label: "96",
-							type: "checkbox",
-							checked: config.options.Threads === 96,
-							click: () => {
-								set_checks("Engine", "Threads", "96");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [96],
-								});
-							}
-						},
-						{
-							label: "64",
-							type: "checkbox",
-							checked: config.options.Threads === 64,
-							click: () => {
-								set_checks("Engine", "Threads", "64");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [64],
-								});
-							}
-						},
-						{
-							label: "48",
-							type: "checkbox",
-							checked: config.options.Threads === 48,
-							click: () => {
-								set_checks("Engine", "Threads", "48");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [48],
-								});
-							}
-						},
-						{
-							label: "32",
-							type: "checkbox",
-							checked: config.options.Threads === 32,
-							click: () => {
-								set_checks("Engine", "Threads", "32");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [32],
-								});
-							}
-						},
-						{
-							label: "24",
-							type: "checkbox",
-							checked: config.options.Threads === 24,
-							click: () => {
-								set_checks("Engine", "Threads", "24");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [24],
-								});
-							}
-						},
-						{
-							label: "16",
-							type: "checkbox",
-							checked: config.options.Threads === 16,
-							click: () => {
-								set_checks("Engine", "Threads", "16");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [16],
-								});
-							}
-						},
-						{
-							label: "14",
-							type: "checkbox",
-							checked: config.options.Threads === 14,
-							click: () => {
-								set_checks("Engine", "Threads", "14");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [14],
-								});
-							}
-						},
-						{
-							label: "12",
-							type: "checkbox",
-							checked: config.options.Threads === 12,
-							click: () => {
-								set_checks("Engine", "Threads", "12");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [12],
-								});
-							}
-						},
-						{
-							label: "10",
-							type: "checkbox",
-							checked: config.options.Threads === 10,
-							click: () => {
-								set_checks("Engine", "Threads", "10");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [10],
-								});
-							}
-						},
-						{
-							label: "8",
-							type: "checkbox",
-							checked: config.options.Threads === 8,
-							click: () => {
-								set_checks("Engine", "Threads", "8");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [8],
-								});
-							}
-						},
-						{
-							label: "7",
-							type: "checkbox",
-							checked: config.options.Threads === 7,
-							click: () => {
-								set_checks("Engine", "Threads", "7");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [7],
-								});
-							}
-						},
-						{
-							label: "6",
-							type: "checkbox",
-							checked: config.options.Threads === 6,
-							click: () => {
-								set_checks("Engine", "Threads", "6");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [6],
-								});
-							}
-						},
-						{
-							label: "5",
-							type: "checkbox",
-							checked: config.options.Threads === 5,
-							click: () => {
-								set_checks("Engine", "Threads", "5");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [5],
-								});
-							}
-						},
-						{
-							label: "4",
-							type: "checkbox",
-							checked: config.options.Threads === 4,
-							click: () => {
-								set_checks("Engine", "Threads", "4");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [4],
-								});
-							}
-						},
-						{
-							label: "3",
-							type: "checkbox",
-							checked: config.options.Threads === 3,
-							click: () => {
-								set_checks("Engine", "Threads", "3");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [3],
-								});
-							}
-						},
-						{
-							label: "2",
-							type: "checkbox",
-							checked: config.options.Threads === 2,
-							click: () => {
-								set_checks("Engine", "Threads", "2");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [2],
-								});
-							}
-						},
-						{
-							label: "1",
-							type: "checkbox",
-							checked: config.options.Threads === 1,
-							click: () => {
-								set_checks("Engine", "Threads", "1");
-								win.webContents.send("call", {
-									fn: "set_threads",
-									args: [1],
-								});
-							}
-						},
-						{
-							type: "separator"
-						},
-						{
-							label: "Warning about threads",
-							click: () => {
-								alert(messages.thread_warning);
-							}
-						},
-					]
-				},
-				{
-					label: "CPuct",
-					submenu: [
-					  {
-							label: "4.0",
-							type: "checkbox",
-							checked: config.options.CPuct === 4.0,
-							click: () => {
-								set_checks("Engine", "CPuct", "4.0");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [4.0],
-								});
-							}
-						},
-						{
-							label: "3.8",
-							type: "checkbox",
-							checked: config.options.CPuct === 3.8,
-							click: () => {
-								set_checks("Engine", "CPuct", "3.8");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [3.8],
-								});
-							}
-						},
-						{
-							label: "3.6",
-							type: "checkbox",
-							checked: config.options.CPuct === 3.6,
-							click: () => {
-								set_checks("Engine", "CPuct", "3.6");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [3.6],
-								});
-							}
-						},
-						{
-							label: "3.4",
-							type: "checkbox",
-							checked: config.options.CPuct === 3.4,
-							click: () => {
-								set_checks("Engine", "CPuct", "3.4");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [3.4],
-								});
-							}
-						},
-						{
-							label: "3.2",
-							type: "checkbox",
-							checked: config.options.CPuct === 3.2,
-							click: () => {
-								set_checks("Engine", "CPuct", "3.2");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [3.2],
-								});
-							}
-						},
-						{
-							label: "3.0",
-							type: "checkbox",
-							checked: config.options.CPuct === 3.0,
-							click: () => {
-								set_checks("Engine", "CPuct", "3.0");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [3.0],
-								});
-							}
-						},
-						{
-							label: "2.8",
-							type: "checkbox",
-							checked: config.options.CPuct === 2.8,
-							click: () => {
-								set_checks("Engine", "CPuct", "2.8");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [2.8],
-								});
-							}
-						},
-						{
-							label: "2.6",
-							type: "checkbox",
-							checked: config.options.CPuct === 2.6,
-							click: () => {
-								set_checks("Engine", "CPuct", "2.6");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [2.6],
-								});
-							}
-						},
-						{
-							label: "2.4",
-							type: "checkbox",
-							checked: config.options.CPuct === 2.4,
-							click: () => {
-								set_checks("Engine", "CPuct", "2.4");
-								win.webContents.send("call", {
-									fn: "set_cpuct",
-									args: [2.4],
-								});
-							}
-						},
-						{
-							type: "separator"
-						},
-						{
-							label: "About CPuct",
-							click: () => {
-								alert(messages.about_cpuct);
-							}
-						}
-					]
-				},
-				{
 					type: "separator"
 				},
 				{
-					label: "Only play White",
+					label: "Make white move",
 					accelerator: "F9",
 					click: () => {
 						win.webContents.send("call", {
@@ -1712,7 +1125,7 @@ function menu_build() {
 					}
 				},
 				{
-					label: "Only play Black",
+					label: "Make black move",
 					accelerator: "F10",
 					click: () => {
 						win.webContents.send("call", {
@@ -1720,24 +1133,7 @@ function menu_build() {
 							args: ["b"],
 						});
 					}
-				},
-				{
-					label: "...and play move at node limit",
-					type: "checkbox",
-					checked: config.autoplay,
-					click: () => {
-						win.webContents.send("call", {
-							fn: "toggle",
-							args: ["autoplay"],
-						});
-					}
-				},
-				{
-					label: "About single colour modes",
-					click: () => {
-						alert(messages.about_versus_mode);
-					}
-				},
+				}
 			]
 		},
 		{
@@ -1993,79 +1389,79 @@ function menu_build() {
 				},
 				{
 					type: "separator"
-				},
-				{
-					label: "I want other size options!",
-					click: () => {
-						alert(messages.about_sizes);
-					}
-				},
+				}
+				/* {
+					 label: "I want other size options!",
+					 click: () => {
+					 alert(messages.about_sizes);
+					 }
+				   }, */
 			]
 		},
-		{
-			label: "Dev",
-			submenu: [
-				{
-					role: "toggledevtools"
-				},
-				{
-					label: "Toggle Debug CSS",
-					click: () => {
-						win.webContents.send("call", "toggle_debug_css");
-					}
-				},
-				{
-					type: "separator"
-				},
-				{
-					label: "Resave config.json",
-					click: () => {
-						win.webContents.send("call", "save_config");
-					}
-				},
-				{
-					type: "separator"
-				},
-				{
-					label: "Fire GC",
-					click: () => {
-						win.webContents.send("call", "fire_gc");
-					}
-				},
-				{
-					label: "Show sync status",
-					click: () => {
-						win.webContents.executeJavaScript("alert(`rok: ${hub.engine.readyok_required}, bm: ${hub.engine.bestmove_required}`)");
-					}
-				},
-				{
-					type: "separator"
-				},
-				{
-					label: "Crash Test",
-					submenu: [
-						{
-							label: "Crash",
-							click: () => {
-								//win.webContents.executeJavaScript("hub.engine.send('stop')");
-								setTimeout(() => {
-									win.webContents.executeJavaScript("process.crash()");
-								}, 500);
-							}
-						},
-						{
-							label: "Hang",
-							click: () => {
-								//win.webContents.executeJavaScript("hub.engine.send('stop')");
-								setTimeout(() => {
-									win.webContents.executeJavaScript("process.hang()");
-								}, 500);
-							}
-						}
-					]
-				},
-			]
-		}
+		/* {
+			 label: "Dev",
+			 submenu: [
+			 {
+			 role: "toggledevtools"
+			 },
+			 {
+			 label: "Toggle Debug CSS",
+			 click: () => {
+			 win.webContents.send("call", "toggle_debug_css");
+			 }
+			 },
+			 {
+			 type: "separator"
+			 },
+			 {
+			 label: "Resave config.json",
+			 click: () => {
+			 win.webContents.send("call", "save_config");
+			 }
+			 },
+			 {
+			 type: "separator"
+			 },
+			 {
+			 label: "Fire GC",
+			 click: () => {
+			 win.webContents.send("call", "fire_gc");
+			 }
+			 },
+			 {
+			 label: "Show sync status",
+			 click: () => {
+			 win.webContents.executeJavaScript("alert(`rok: ${hub.engine.readyok_required}, bm: ${hub.engine.bestmove_required}`)");
+			 }
+			 },
+			 {
+			 type: "separator"
+			 },
+			 {
+			 label: "Crash Test",
+			 submenu: [
+			 {
+			 label: "Crash",
+			 click: () => {
+			 //win.webContents.executeJavaScript("hub.engine.send('stop')");
+			 setTimeout(() => {
+			 win.webContents.executeJavaScript("process.crash()");
+			 }, 500);
+			 }
+			 },
+			 {
+			 label: "Hang",
+			 click: () => {
+			 //win.webContents.executeJavaScript("hub.engine.send('stop')");
+			 setTimeout(() => {
+			 win.webContents.executeJavaScript("process.hang()");
+			 }, 500);
+			 }
+			 }
+			 ]
+			 },
+			 ]
+		   } // dev */
 	];
 
 	return electron.Menu.buildFromTemplate(template);
