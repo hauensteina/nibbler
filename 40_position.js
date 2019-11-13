@@ -34,7 +34,7 @@ const position_prototype = {
 		let ret = this.copy();
 
 		let promotion_char = s.length > 4 ? s[4].toLowerCase() : "q";
-		
+
 		let white_flag = this.is_white(Point(x1, y1));
 		let pawn_flag = "Pp".includes(ret.state[x1][y1]);
 		let capture_flag = ret.state[x2][y2] !== "";
@@ -304,7 +304,7 @@ const position_prototype = {
 
 				// Check that king source square and the pass-through square aren't under attack.
 				// Destination will be handled by the general in-check test later.
-				
+
 				if (this.attacked(Point(x1, y1), this.active)) {
 					return "cannot castle under check";
 				}
@@ -423,10 +423,12 @@ const position_prototype = {
 		}
 	},
 
+  //-----------------------------------------
 	attacked: function(target, my_colour) {
 
 		if (!my_colour) {
-			throw "attacked(): no colour given";
+			//throw "attacked(): no colour given";
+      return false
 		}
 
 		if (!target || target === Point(null)) {
@@ -464,7 +466,7 @@ const position_prototype = {
 		}
 
 		return false;
-	},
+	}, // attacked()
 
 	line_attack: function(target, step_x, step_y, my_colour) {
 
@@ -989,7 +991,7 @@ function NewPosition(state = null, active = "w", castling = "", enpassant = null
 
 	p.active = active;
 	p.castling = castling;
-	
+
 	if (enpassant) {
 		p.enpassant = enpassant;
 	} else {

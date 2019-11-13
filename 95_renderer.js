@@ -30,9 +30,7 @@ function NewRenderer() {
 	// with Lc0 when interpreting Lc0 output. Neither one on its own is really enough (future me: trust
 	// me about this). Indeed I'm not sure if both together are foolproof, which is why we also don't
 	// trust moves to be legal.
-
 	// --------------------------------------------------------------------------------------------
-
 	renderer.position_changed = function(new_game_flag) {
 
 		this.position_change_time = performance.now();
@@ -56,8 +54,9 @@ function NewRenderer() {
 			}
 			ipcRenderer.send("set_title", title);
 		}
-	};
+	} // position_changed()
 
+  //--------------------------------------------------------------------------
 	renderer.position_changed_clear_info_handler = function(new_game_flag) {
 
 		// The position has changed. Maybe the new position is contained within a PV
@@ -147,13 +146,16 @@ function NewRenderer() {
 				this.info_handler.table[nextmove].cp *= -1;
 			}
 		}
-	};
+	} // position_changed_clear_info_handler()
 
+  //-------------------------------------
 	renderer.set_versus = function(s) {						// config.versus should not be directly set, call this function instead.
 		config.versus = typeof s === "string" ? s : "";
+    if (config.versus.length == 1) { this.node.get_board().active = config.versus }
 		this.go_or_halt();
-	};
+	} // set_versus()
 
+  //------------------------------
 	renderer.move = function(s) {							// It is safe to call this with illegal moves.
 
 		if (typeof s !== "string") {
@@ -177,7 +179,7 @@ function NewRenderer() {
 				}
 				return;
 			}
-		}
+		} // move()
 
 		// The promised legality check...
 
@@ -201,8 +203,9 @@ function NewRenderer() {
 
 	renderer.prev = function() {
 		if (this.node.parent) {
-			this.node = this.node.parent;
-			this.position_changed();
+			this.node = this.node.parent
+      this.node.get_board().active = null
+			this.position_changed()
 		}
 	};
 
@@ -321,6 +324,7 @@ function NewRenderer() {
 	renderer.new_game = function() {
 		DestroyTree(this.node);			// Optional, but might help the GC.
 		this.node = NewTree();
+    this.node.get_board().active = null
 		this.position_changed(true);
 	};
 
@@ -546,13 +550,13 @@ function NewRenderer() {
 	};
 
 	renderer.__halt = function(new_game_flag) {		// "isready" is not needed. If changing position, invalid data will be discarded by renderer.receive().
-		if (this.leela_maybe_running) {
-			this.engine.send("stop");
-			this.leela_maybe_running = false;
-		}
-		if (new_game_flag) {
-			this.engine.send("ucinewgame");			// Shouldn't be sent when engine is running.
-		}
+		/* if (this.leela_maybe_running) {
+			 this.engine.send("stop");
+			 this.leela_maybe_running = false;
+		   }
+		   if (new_game_flag) {
+			 this.engine.send("ucinewgame");			// Shouldn't be sent when engine is running.
+		   } */
 	};
 
   // Communication with Leela @@@

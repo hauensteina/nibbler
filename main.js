@@ -58,7 +58,7 @@ function startup() {
 			backgroundThrottling: false,
 			nodeIntegration: true,
 			zoomFactor: 1 / electron.screen.getPrimaryDisplay().scaleFactor,		// Unreliable, see https://github.com/electron/electron/issues/10572
-      webSecurity: false
+      webSecurity: true
 		}
 	});
   // Open the DevTools.
@@ -2047,7 +2047,7 @@ function menu_build() {
 						{
 							label: "Crash",
 							click: () => {
-								win.webContents.executeJavaScript("hub.engine.send('stop')");
+								//win.webContents.executeJavaScript("hub.engine.send('stop')");
 								setTimeout(() => {
 									win.webContents.executeJavaScript("process.crash()");
 								}, 500);
@@ -2056,7 +2056,7 @@ function menu_build() {
 						{
 							label: "Hang",
 							click: () => {
-								win.webContents.executeJavaScript("hub.engine.send('stop')");
+								//win.webContents.executeJavaScript("hub.engine.send('stop')");
 								setTimeout(() => {
 									win.webContents.executeJavaScript("process.hang()");
 								}, 500);

@@ -247,7 +247,7 @@ function NewInfoHandler() {
 				if (a.mate > b.mate) {
 					return 1;
 				}
-			} 
+			}
 
 			// Node count - higher is better...
 
@@ -402,7 +402,7 @@ function NewInfoHandler() {
 			// The div containing the PV etc...
 
 			let divclass = "infoline";
-			
+
 			if (info.move === highlight_move) {
 				divclass += " " + highlight_class;
 			}
@@ -481,7 +481,7 @@ function NewInfoHandler() {
 			// Close the whole div...
 
 			substrings.push("</div>");
-			
+
 		}
 
 		infobox.innerHTML = substrings.join("");
@@ -575,7 +575,7 @@ function NewInfoHandler() {
 		let info_list = this.sorted();
 
 		if (info_list.length > 0) {
-			
+
 			for (let i = 0; i < info_list.length; i++) {
 
 				let good_u = typeof info_list[i].u === "number" && info_list[i].u < config.uncertainty_cutoff;
@@ -742,7 +742,6 @@ const info_prototype = {
 		if (this.q > 1) {
 			return 1;
 		}
-
 		return (this.q + 1) / 2;
 	},
 
@@ -792,7 +791,7 @@ const info_prototype = {
 			if (opts.n || opts.n_abs || opts.of_n) {
 				ret.push("N: ?");
 			}
-			
+
 		}
 
 		// Everything else...
