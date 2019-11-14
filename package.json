@@ -1,42 +1,15 @@
 {
-  "name": "Nibbler",
-  "version": "1.1.2",
+  "name": "nibbler-rest",
+  "productName": "Nibbler REST",
+  "version": "0.0.1",
   "author": "Fohristiwhirl and hauensteina",
   "description": "Leela Chess Zero (Lc0) interface, mod for https remote engine",
-  "license": "GPL-3.0",
-  "main": "./main.js",
+  "main": "main.js",
   "scripts": {
-    "postinstall": "electron-builder install-app-deps",
-    "start": "npm install && electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
-  },
-  "build": {
-    "appId": "com.ahaux.nibbler",
-    "dmg": {
-      "contents": [
-        {
-          "x": 110,
-          "y": 150
-        },
-        {
-          "x": 240,
-          "y": 150,
-          "type": "link",
-          "path": "/Applications"
-        }
-      ]
-    },
-    "linux": {
-      "target": [
-        "AppImage",
-        "deb"
-      ]
-    },
-    "win": {
-      "target": "NSIS",
-      "icon": "build/icon.ico"
-    }
+    "start": "electron .",
+    "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
+    "package-win": "electron-packager . electron-tutorial-app --overwrite --asar=true --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"Nibbler REST\"",    
+    "package-linux": "electron-packager . nibbler-rest --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
   },
   "dependencies": {
     "electron-fetch": "^1.3.0",
@@ -44,6 +17,6 @@
   },
   "devDependencies": {
     "electron": "^7.1.1",
-    "electron-builder": "^22.1.0"
+    "electron-packager": "^14.1.0"
   }
 }
