@@ -62,7 +62,7 @@ function startup() {
 		}
 	});
   // Open the DevTools.
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
 
 	win.once("ready-to-show", () => {
 		win.webContents.setZoomFactor(1 / electron.screen.getPrimaryDisplay().scaleFactor);		// This seems to work, note issue 10572 above.
