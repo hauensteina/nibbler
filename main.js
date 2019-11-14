@@ -1,5 +1,8 @@
 "use strict";
 
+//const LC0_URL = 'https://ahaux.com/lc0-server-test/'
+const LC0_URL = 'https://ahaux.com/lc0-server/'
+
 const alert = require("./modules/alert");
 const electron = require("electron");
 const config_io = require("./modules/config_io");
@@ -62,7 +65,7 @@ function startup() {
 		}
 	});
   // Open the DevTools.
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
 
 	win.once("ready-to-show", () => {
 		win.webContents.setZoomFactor(1 / electron.screen.getPrimaryDisplay().scaleFactor);		// This seems to work, note issue 10572 above.
@@ -1496,8 +1499,6 @@ function set_checks(...menupath) {
 }
 
 const {ipcMain} = require('electron')
-const LC0_URL = 'https://ahaux.com/lc0_server_test/'
-//const LC0_URL = 'https://ahaux.com/lc0_server/'
 
 // The client (aka renderer) cannot call external APIs directly.
 // This is the proxy. (AHN)
