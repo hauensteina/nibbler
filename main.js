@@ -3,6 +3,20 @@
 //const LC0_URL = 'https://ahaux.com/lc0-server-test/'
 const LC0_URL = 'https://ahaux.com/lc0-server/'
 
+var cmd = process.argv[1];
+
+if (cmd == '--squirrel-firstrun') {
+    // Running for the first time.
+    process.argv.splice( 1,1) // avoid error after windows install
+}
+
+//handle setupevents as quickly as possible
+ const setupEvents = require('./installers/setupEvents')
+ if (setupEvents.handleSquirrelEvent()) {
+    // squirrel event handled and app will exit in 1000ms, so don't do anything else
+    return;
+ }
+
 const alert = require("./modules/alert");
 const electron = require("electron");
 const config_io = require("./modules/config_io");
