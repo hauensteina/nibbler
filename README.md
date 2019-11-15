@@ -6,7 +6,7 @@ remote REST version of Leela Chess Zero.
 The idea is that anybody can just use lc0 without
 needing a GPU or even any install of Leela at all.
 
-It is and Electron app, so make sure you have Node and Electron installed.
+Nibbler is an Electron app, so make sure you have Node and Electron installed.
 Tested on Mac and Windows, but should work on Linux, too.
 
 To start, say
