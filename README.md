@@ -21,7 +21,7 @@ If you want to host an lc0 server yourself, the code for the remote server can b
 
 https://github.com/hauensteina/lc0-server.git
 
-The original Nibbler with detailed build instructions etc is here:
+The original Nibbler with detailed build instructions is here:
 
 https://github.com/fohristiwhirl/nibbler.git
 
