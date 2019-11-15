@@ -3,7 +3,7 @@
 This a version of Nibbler which is able to communicate with a
 remote REST version of Leela Chess Zero.
 
-It's all a work in progress right now, you might want to wait a week before trying.
+This is now fully functional.
 
 The idea is that anybody can just use lc0 without
 needing a GPU or even any install of Leela at all.
